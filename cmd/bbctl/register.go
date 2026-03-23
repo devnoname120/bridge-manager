@@ -70,6 +70,7 @@ type RegisterJSON struct {
 }
 
 func doRegisterBridge(ctx *cli.Context, bridge, bridgeType string, onlyGet bool) (*RegisterJSON, error) {
+	bridgeType = bridgeTypeToLocal(bridgeType)
 	whoami, err := getCachedWhoami(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get whoami: %w", err)
@@ -111,13 +112,14 @@ func doRegisterBridge(ctx *cli.Context, bridge, bridgeType string, onlyGet bool)
 	if (bridgeType != "" && bridgeType != "heisenbridge") || bridge == "androidsms" || bridge == "imessagecloud" || bridge == "imessage" {
 		state = status.StateStarting
 	}
+	reportedBridgeType := bridgeTypeForServer(bridgeType)
 
 	if !ctx.Bool("no-state") {
 		err = beeperapi.PostBridgeState(ctx.String("homeserver"), GetEnvConfig(ctx).Username, bridge, resp.AppToken, beeperapi.ReqPostBridgeState{
 			StateEvent:   state,
 			Reason:       "SELF_HOST_REGISTERED",
 			IsSelfHosted: true,
-			BridgeType:   bridgeType,
+			BridgeType:   reportedBridgeType,
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to mark bridge as RUNNING: %w", err)

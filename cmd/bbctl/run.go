@@ -267,16 +267,17 @@ func runBridge(ctx *cli.Context) error {
 			return fmt.Errorf("failed to get whoami: %w", err)
 		}
 		existingBridge, ok := whoami.User.Bridges[bridgeName]
-		if !ok || existingBridge.BridgeState.BridgeType == "" {
+		existingBridgeType := bridgeTypeToLocal(existingBridge.BridgeState.BridgeType)
+		if !ok || existingBridgeType == "" {
 			log.Printf("Existing bridge type not found, falling back to generating new config")
 			doWriteConfig = true
-		} else if reg, err := doRegisterBridge(ctx, bridgeName, existingBridge.BridgeState.BridgeType, true); err != nil {
+		} else if reg, err := doRegisterBridge(ctx, bridgeName, existingBridgeType, true); err != nil {
 			log.Printf("Failed to get existing bridge registration: %v", err)
 			log.Printf("Falling back to generating new config")
 			doWriteConfig = true
 		} else {
 			cfg = &generatedBridgeConfig{
-				BridgeType:   existingBridge.BridgeState.BridgeType,
+				BridgeType:   existingBridgeType,
 				RegisterJSON: reg,
 			}
 		}

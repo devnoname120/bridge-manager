@@ -56,6 +56,24 @@ var websocketBridges = map[string]bool{
 	"telegram":     true,
 }
 
+func bridgeTypeToLocal(bridgeType string) string {
+	switch bridgeType {
+	case "discordgo":
+		return "discord"
+	default:
+		return bridgeType
+	}
+}
+
+func bridgeTypeForServer(bridgeType string) string {
+	switch bridgeType {
+	case "discord":
+		return "discordgo"
+	default:
+		return bridgeType
+	}
+}
+
 func doOutputFile(ctx *cli.Context, name, data string) error {
 	outputPath := ctx.String("output")
 	if outputPath == "-" {
@@ -85,6 +103,7 @@ func validateBridgeName(ctx *cli.Context, bridge string) error {
 }
 
 func guessOrAskBridgeType(bridge, bridgeType string) (string, error) {
+	bridgeType = bridgeTypeToLocal(bridgeType)
 	if bridgeType == "" {
 	Outer:
 		for _, br := range officialBridges {

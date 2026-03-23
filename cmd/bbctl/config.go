@@ -234,7 +234,7 @@ func doGenerateBridgeConfig(ctx *cli.Context, bridge string) (*generatedBridgeCo
 	existingBridge, ok := whoami.User.Bridges[bridge]
 	var bridgeType string
 	if ok && existingBridge.BridgeState.BridgeType != "" {
-		bridgeType = existingBridge.BridgeState.BridgeType
+		bridgeType = bridgeTypeToLocal(existingBridge.BridgeState.BridgeType)
 	} else {
 		bridgeType, err = guessOrAskBridgeType(bridge, ctx.String("type"))
 		if err != nil {
