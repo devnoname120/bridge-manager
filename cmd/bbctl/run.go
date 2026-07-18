@@ -217,6 +217,13 @@ func makeCmd(ctx context.Context, pwd, path string, args ...string) *exec.Cmd {
 	return cmd
 }
 
+func localBuildScript(bridgeType string) string {
+	if bridgeType == "instagram" {
+		return "./build-ig.sh"
+	}
+	return "./build.sh"
+}
+
 func runBridge(ctx *cli.Context) error {
 	if ctx.NArg() == 0 {
 		return UserError{"You must specify a bridge to run"}
@@ -322,7 +329,7 @@ func runBridge(ctx *cli.Context) error {
 		bridgeCmd = filepath.Join(dataDir, "binaries", binaryName)
 		if localDev && overrideBridgeCmd == "" {
 			bridgeCmd = filepath.Join(bridgeDir, binaryName)
-			buildScript := "./build.sh"
+			buildScript := localBuildScript(cfg.BridgeType)
 			log.Printf("Compiling [cyan]%s[reset] with %s", binaryName, buildScript)
 			err = makeCmd(ctx.Context, bridgeDir, buildScript).Run()
 			if err != nil {
